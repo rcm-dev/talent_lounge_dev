@@ -131,7 +131,7 @@ include 'class/api.php';
 					<ul id="navmenu" class="">
 						<li><a href="creative-idea.php" title="Showcase">Showcase</a></li>
 						<li><a href="allUser.php" title="Talent">Talent</a></li>
-						<li><a href="recruitment/company_directory2.php" title="Companies">Companies</a></li>
+						<li><a href="company_directory2.php" title="Companies">Companies</a></li>
 						<li><a href="recruitment/jobsOpeningAll.php" title="Jobs">Jobs</a></li>
 						<li><a href="#" title="Chalk Talk">Chalk Talk</a></li>
 						<li><a href="#" title="Training">Training</a></li>
