@@ -57,8 +57,13 @@ function seo_url($string)
 
 <div>
 	<div class="center">
+
 		content list
 		<p>edit by sal</p>
+
+		content list     
+		<div>testing yana</div>
+
 	</div>
 </div>
 
