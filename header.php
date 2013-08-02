@@ -133,7 +133,7 @@ include 'class/api.php';
 						<li><a href="allUser.php" title="Talent">Talent</a></li>
 						<li><a href="company_directory2.php" title="Companies">Companies</a></li>
 						<li><a href="recruitment/jobsOpeningAll.php" title="Jobs">Jobs</a></li>
-						<li><a href="#" title="Chalk Talk">Chalk Talk</a></li>
+						<li><a href="chalk.php" title="Chalk Talk">Chalk Talk</a></li>
 						<li><a href="training_list.php" title="Training">Training</a></li>
 						<li style="display:none"><a href="recruitment/index.php" title="Recruitment">Recruitment</a>
 							<ul style="display:none">
@@ -189,7 +189,7 @@ include 'class/api.php';
 						<li><a href="talent.php" title="Talent">Talent</a></li>
 						<li><a href="companies.php" title="Companies">Companies</a></li>
 						<li><a href="jobs.php" title="Jobs">Jobs</a></li>
-						<li><a href="chalk_talk.php" title="Chalk Talk">Chalk Talk</a></li>
+						<li><a href="chalk.php" title="Chalk Talk">Chalk Talk</a></li>
 						<li><a href="training_list.php" title="Training">Training</a></li>
 
 						<li style="display:none"><a href="index.php" title="Back to Home">Home</a></li>
