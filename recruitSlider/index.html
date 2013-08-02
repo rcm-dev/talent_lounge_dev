@@ -1,0 +1,54 @@
+<html>
+<head>
+	<title>Landing SME</title>
+	<!-- Place somewhere in the <head> of your document -->
+	<link rel="stylesheet" href="flexslider.css" type="text/css">
+	<script src="../.js/jquery-1.7.1.min.js"></script>
+	<script src="jquery.flexslider.js"></script>
+	<style>
+		.smeWrap {
+			width: 620px;
+			height: 340px;
+      overflow: hidden;
+		}
+		body {
+			margin:0;
+			padding:0;
+		}
+	</style>
+</head>
+<body>
+<!-- Place somewhere in the <body> of your page -->
+<div class="flexslider smeWrap">
+  <ul class="slides">
+    <li>
+      <img src="slide/slide1.jpg" />
+    </li>
+    <li>
+      <img src="slide/slide2.jpg" />
+    </li>
+    <li>
+      <img src="slide/slide3.jpg" />
+    </li>
+    <li>
+      <img src="slide/slide4.jpg" />
+    </li>
+  </ul>
+</div>
+<!-- Place in the <head>, after the three links -->
+<script type="text/javascript" charset="utf-8">
+  $(window).load(function() {
+    $('.flexslider').flexslider({
+    	animation: "slide",
+        slideshow: true,                //Boolean: Animate slider automatically
+        slideshowSpeed: 4000,           //Integer: Set the speed of the slideshow cycling, in milliseconds
+        animationSpeed: 800,            //Integer: Set the speed of animations, in milliseconds
+        initDelay: 0,
+        keyboard: false,
+        pauseOnAction: false,            //Boolean: Pause the slideshow when interacting with control elements, highly recommended.
+        pauseOnHover: true 
+    });
+  });
+</script>
+</body>
+</html>

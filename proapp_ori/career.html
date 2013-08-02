@@ -1,0 +1,202 @@
+<html>
+<head>
+	<title>Report for Employer</title>
+	<link href="SpryAssets/SpryTabbedPanels.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="SpryAssets/SpryTabbedPanels.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Year', 'Mark'],
+          ['D',  60],
+          ['I',  50],
+          ['S',  25],
+          ['C',  40]
+        ]);
+
+        var options = {
+          title: 'DISC',
+          hAxis: {title: 'RESULT', titleTextStyle: {color: 'BLUE'}}
+        };
+
+        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }
+	  </script>
+	  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(drawChart2);
+    
+	  function drawChart2() {
+	  var data2 = google.visualization.arrayToDataTable([
+          ['Year', 'Mark'],
+          ['F',  30],
+          ['I',  50],
+          ['C',  45],
+          ['E',  20]
+        ]);
+
+        var options = {
+          title: 'FICE',
+          hAxis: {title: 'RESULT', titleTextStyle: {color: 'BLUE'}}
+        };
+
+        var chart2 = new google.visualization.ColumnChart(document.getElementById('chart_div2'));
+        chart2.draw(data2, options);
+      }
+	  
+	  
+	  </script>
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(drawChart3);
+      function drawChart3() {
+        var data3 = google.visualization.arrayToDataTable([
+          ['Task', 'Mark'],
+          ['Factual',     11],
+          ['Instrinctive',      2],
+          ['Conceptual',  2],
+          ['Experiental', 2]
+         
+        ]);
+
+        var options= {
+          title: 'Thinking'
+        };
+
+        var chart3 = new google.visualization.PieChart(document.getElementById('chart_div3'));
+        chart3.draw(data3, options);
+      }
+    </script>
+ 
+    <style type="text/css" media="screen">
+    	body {
+    		font-family: Arial;
+    		font-size: 12px;
+    		background-color: #F0F0F0;
+    	}
+
+    	#wrapper {
+    		background-color: white;
+    		width: 1000px;
+    		margin: 0 auto;
+    		padding: 10px;
+
+    		border-radius: 10px;
+    		-webkit-border-radius: 10px;
+    		-moz-border-radius: 10px;
+    	}
+    </style>
+</head>
+<body>
+
+<div id="wrapper">
+	
+
+<h1>Report for Employer</h1>
+
+<h4>Viewing Ahmad Report</h4>
+<div class="alert alert-info container"> 
+<table width="100%">
+	<tbody>
+	<tr>
+		<td><h5>PROFILE PICTURE</h5></td>
+		 
+		<td width="744"><h5>PROFILE DETAILS</h5></td>
+	</tr>
+</tr>
+
+				              
+				              
+    <td width="224"><img src="images/player/2.jpg"   />
+				        <div class="box resumebox">
+      <td><p>ahmad albab</p>
+			                <p>petaling jaya</p></td>
+				        </tr>
+	</tbody>
+</table>
+<br/>
+</div>
+<table width="100%" style="border-collapse: collapse" border="1">
+	<tbody>
+		<tr>
+			<td>Test</td>
+			<td>DISC</td>
+			<td>LITE</td>
+			<td>LSE</td>
+			<td>LEPJ</td>
+		</tr>
+		<tr>
+			<td>Score</td>
+			<td>DI</td>
+			<td>L</td>
+			<td>L</td>
+			<td>PJ</td>
+		</tr>
+	</tbody>
+</table>
+
+  <h2>Strengths</h2>
+
+<div id="chart_div" style="width: 900px; height: 500px;"></div>
+
+<h4>Overview</h4>
+<div>
+	<?php  
+
+	/**
+	 *
+	 * Record Set for Generate_D
+	 * Retrieve via object 
+	 * 
+	 */
+	$query_Generate_D     = "SELECT FROM ACTIVE ROLE GROUP BY D";
+	$rs_Generate_D        = mysql_query($query_Generate_D) or die(mysql_error());
+	$row_Generate_D       = mysql_fetch_object($rs_Generate_D);
+	$totalRows_Generate_D = mysql_num_rows($rs_Generate_D);
+	
+
+	?>
+	<hr>
+	<?php  
+
+	/**
+	 *
+	 * Record Set for Generate_I
+	 * Retrieve via object 
+	 * 
+	 */
+	$query_Generate_I     = "SELECT FROM ACTIVE ROLE GROUP BY I";
+	$rs_Generate_I        = mysql_query($query_Generate_I) or die(mysql_error());
+	$row_Generate_I       = mysql_fetch_object($rs_Generate_I);
+	$totalRows_Generate_I = mysql_num_rows($rs_Generate_I);
+	
+
+	?>
+</div>
+
+<h4>Career Recommendations</h4>
+<div>
+	Same as Above generate from D and I
+</div>
+<h4>Industry Cluster List</h4>
+<div>
+	Same as Above generate from D and I
+</div>
+<h4>Salary Structure</h4>
+<div>
+	Same as Above generate from D and I
+</div>
+<h4>Companies</h4>
+<div>
+	Same as Above generate from D and I
+</div>
+</div>
+<!-- /#wrapper -->
+</body>
+</html>

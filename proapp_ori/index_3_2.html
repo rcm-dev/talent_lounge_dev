@@ -1,0 +1,73 @@
+<html>
+<head>
+  <title>X Y X</title>
+  <script src="js/jquery-1.7.1.min.js" type="text/javascript"></script>
+</head>
+<body>
+
+<table border="1" cellspacing="4" cellpadding="4" style="border-collapse: collapse" width="100">
+  <tbody>
+    <tr>
+      <td>Soklan 1</td>
+    </tr>
+    <tr>
+      <td>
+        <input type="radio" name="answer1" class="x" value="X" /> X <br>
+        <input type="radio" name="answer1" class="y" value="Y" /> Y <br>
+        <input type="radio" name="answer1" class="z" value="Z" /> Z <br>
+      </td>
+    </tr>
+    <tr><td>&nbsp;</td></tr>
+    <tr>
+      <td>Soklan 2</td>
+    </tr>
+    <tr>
+      <td>
+        <input type="radio" name="answer2" class="x" value="X" /> X <br>
+        <input type="radio" name="answer2" class="y" value="Y" /> Y <br>
+        <input type="radio" name="answer2" class="z" value="Z" /> Z <br>
+      </td>
+    </tr>
+    <tr><td>&nbsp;</td></tr>
+    <tr>
+      <td>Soklan 3</td>
+    </tr>
+    <tr>
+      <td>
+        <input type="radio" name="answer3" class="x" value="X" /> X <br>
+        <input type="radio" name="answer3" class="y" value="Y" /> Y <br>
+        <input type="radio" name="answer3" class="z" value="Z" /> Z <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  <input type="button" name="getTotal" id="getTotal" value="Show Count">
+</p>
+
+<p>
+  <span class="x_results">0</span> X &ndash; <span class="y_results">0</span> Y &ndash; <span class="z_results">0</span> Z
+</p>
+
+
+<script type="text/javascript">
+  $(document).ready(function(){
+
+    $('input:radio').change(function(){
+        var numOfx = $('.x:checked').length
+        var numOfy = $('.y:checked').length 
+        var numOfz = $('.z:checked').length 
+
+        $('.x_results').text(numOfx)
+        $('.y_results').text(numOfy)                        
+        $('.z_results').text(numOfz)
+    })
+        
+
+    console.log('LOADED!');
+
+  });
+</script>
+</body>
+</html>

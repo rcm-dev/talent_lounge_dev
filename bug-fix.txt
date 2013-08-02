@@ -1,0 +1,7 @@
+BUG FIX
+
+- send message at search network result
+- profiling details
+- pdf at profiling
+- mind map tool
+- notification page

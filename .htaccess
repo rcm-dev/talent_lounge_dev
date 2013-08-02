@@ -1,0 +1,43 @@
+RewriteEngine On
+
+# rewrite product details to URL Friendly
+# RewriteRule ^([^-]*)-market-([^-]*)\.html$ product-details.php?slug=$1&id=$2 [L]
+RewriteRule ^([^-]*)-id-([^-]*)\.html$ product-details.php?slug=$1&id=$2 [L]
+
+
+# rewrite idea section
+RewriteRule ^([^-]*)-idea-([^-]*)\.html$ idea-details.php?slug=$1&id=$2 [L]
+
+# rewrite funding section
+RewriteRule ^([^-]*)-project-([^-]*)\.html$ funding-details.php?slug=$1&id=$2 [L]
+
+# rewrite success funding
+RewriteRule ^([^-]*)-success-project-([^-]*)\.html$ success-funding-details.php?slug=$1&id=$2 [L]
+
+# rewrite failed funding
+RewriteRule ^([^-]*)-failed-project-([^-]*)\.html$ failed-funding-details.php?slug=$1&id=$2 [L]
+
+# rewrite page
+RewriteRule ^([^-]*)-([^-]*)\.html$ page.php?page_id=$1&page_title=$2 [L]
+
+
+
+# Custom 404 errors
+# later change url to redirect
+# ErrorDocument 404 http://sb.richcoremedia.com/error404
+# ErrorDocument 404 http://localhost:81/sb/error404
+RewriteRule ^error404 error404.html [L]
+
+RedirectMatch 301 ^/images/*$ http://pathfinder.my/
+RedirectMatch 301 ^/ajax/$ http://pathfinder.my/
+RedirectMatch 301 ^/class/$ http://pathfinder.my/
+RedirectMatch 301 ^/css/$ http://pathfinder.my/
+RedirectMatch 301 ^/db/$ http://pathfinder.my/
+RedirectMatch 301 ^/img/$ http://pathfinder.my/
+RedirectMatch 301 ^/js/$ http://pathfinder.my/
+RedirectMatch 301 ^/plugins/$ http://pathfinder.my/
+RedirectMatch 301 ^/testing/$ http://pathfinder.my/
+RedirectMatch 301 ^/uploadify/$ http://pathfinder.my/
+RedirectMatch 301 ^/uploads/$ http://pathfinder.my/
+RedirectMatch 301 ^/vid/$ http://pathfinder.my/
+RedirectMatch 301 ^/webfonts/$ http://pathfinder.my/
