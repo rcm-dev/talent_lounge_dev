@@ -185,7 +185,7 @@ include 'class/api.php';
 
 					<nav >
 					<ul id="navmenu" class="">
-						<li><a href="showcase.php" title="Showcase">Showcase</a></li>
+						<li><a href="creative-idea.php" title="Showcase">Showcase</a></li>
 						<li><a href="talent.php" title="Talent">Talent</a></li>
 						<li><a href="companies.php" title="Companies">Companies</a></li>
 						<li><a href="jobs.php" title="Jobs">Jobs</a></li>

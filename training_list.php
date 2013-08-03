@@ -58,6 +58,7 @@ function seo_url($string)
 <div>
 	<div class="center">
 		content list
+	
 	</div>
 </div>
 

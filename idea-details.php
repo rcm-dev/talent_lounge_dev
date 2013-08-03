@@ -701,7 +701,7 @@ if ($rowqProDetails->fund_post_published != 0) {
 
 									<?php if (isset($usr_email)): ?>
 									<a href="#" id="send-request-friend">
-									<div style="float:right" class="button green">ASSOCIATE<?php echo $rowviewusrSQL->currName; ?>s</div>
+									<div style="float:right" class="button green">ASSOCIATE<?php echo $rowviewusrSQL->currName; ?></div>
 									</a>
 									<?php endif ?>
 
