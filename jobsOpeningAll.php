@@ -39,70 +39,42 @@ $rsTenLatestJob = mysql_query($query_rsTenLatestJob, $conJobsPerak) or die(mysql
 $row_rsTenLatestJob = mysql_fetch_assoc($rsTenLatestJob);
 $totalRows_rsTenLatestJob = mysql_num_rows($rsTenLatestJob);
 
-$maxRows_rsAllTalent = 30;
-$pageNum_rsAllTalent = 0;
-if (isset($_GET['pageNum_rsAllTalent'])) {
-  $pageNum_rsAllTalent = $_GET['pageNum_rsAllTalent'];
+$maxRows_rsJobsOpening = 30;
+$pageNum_rsJobsOpening = 0;
+if (isset($_GET['pageNum_rsJobsOpening'])) {
+  $pageNum_rsJobsOpening = $_GET['pageNum_rsJobsOpening'];
 }
-$startRow_rsAllTalent = $pageNum_rsAllTalent * $maxRows_rsAllTalent;
+$startRow_rsJobsOpening = $pageNum_rsJobsOpening * $maxRows_rsJobsOpening;
 
 mysql_select_db($database_conJobsPerak, $conJobsPerak);
-$query_rsAllTalent = "SELECT
-  mj_users.user_pic As usrPicture,
-  mj_users.usr_last_login As setLastlogin,
-  mj_users.usr_email As setemail,
-  mj_users.usr_id,
-  mj_users.usr_name As currName,
-  mj_users.usr_workat As WorkAt,
-  
-  mj_users.usr_general_info As CurGenInfo,
-  mj_users.usr_rating,
-  mj_users.usr_core_activity,
-  mj_users.mj_sector_fk,
-  mj_users.mj_services_fk,
-  mj_sector.sec_name,
-  mj_services.services_name As Profession,
-  mj_state.state_name As Location,
-  mj_country.country_name,
-  jp_skills.skills_name As Skills,
-  jp_edu_lists.edu_name As Education
+$query_rsJobsOpening = "SELECT jp_ads.*, jp_location.*, jp_employer.* FROM jp_ads INNER JOIN jp_location ON jp_ads.ads_location = jp_location.location_id INNER JOIN jp_employer ON jp_ads.emp_id_fk = jp_employer.emp_id WHERE jp_ads.ads_enable_view = 1 ORDER BY ads_date_posted DESC";
+$query_limit_rsJobsOpening = sprintf("%s LIMIT %d, %d", $query_rsJobsOpening, $startRow_rsJobsOpening, $maxRows_rsJobsOpening);
+$rsJobsOpening = mysql_query($query_limit_rsJobsOpening, $conJobsPerak) or die(mysql_error());
+$row_rsJobsOpening = mysql_fetch_assoc($rsJobsOpening);
 
-From
-  mj_users Inner Join
-  mj_sector On mj_users.mj_sector_fk = mj_sector.sec_id Inner Join
-  mj_services On mj_users.mj_services_fk = mj_services.services_id Inner Join
-  mj_state On mj_users.mj_state_fk = mj_state.state_id Inner Join
-  mj_country On mj_users.mj_country_id_fk = mj_country.country_id Inner Join
-  jp_skills On jp_skills.user_id_fk = mj_users.users_id Inner Join
-  jp_education On jp_education.user_id_fk = mj_users.users_id Inner Join
-  jp_edu_lists On jp_education.edu_qualification = jp_edu_lists.edu_id ";
-$query_limit_rsAllTalent = sprintf("%s LIMIT %d, %d", $query_rsAllTalent, $startRow_rsAllTalent, $maxRows_rsAllTalent);
-$rsAllTalent = mysql_query($query_limit_rsAllTalent, $conJobsPerak) or die(mysql_error());
-$row_rsAllTalent = mysql_fetch_assoc($rsAllTalent);
-
-if (isset($_GET['totalRows_rsAllTalent'])) {
-  $totalRows_rsAllTalent = $_GET['totalRows_rsAllTalent'];
+if (isset($_GET['totalRows_rsJobsOpening'])) {
+  $totalRows_rsJobsOpening = $_GET['totalRows_rsJobsOpening'];
 } else {
-  $all_rsAllTalent = mysql_query($query_rsAllTalent);
-  $totalRows_rsAllTalent = mysql_num_rows($all_rsAllTalent);
+  $all_rsJobsOpening = mysql_query($query_rsJobsOpening);
+  $totalRows_rsJobsOpening = mysql_num_rows($all_rsJobsOpening);
 }
-$totalPages_rsAllTalent = ceil($totalRows_rsAllTalent/$maxRows_rsAllTalent)-1;
+$totalPages_rsJobsOpening = ceil($totalRows_rsJobsOpening/$maxRows_rsJobsOpening)-1;
 
-$queryString_rsAllTalent = "";
+$queryString_rsJobsOpening = "";
 if (!empty($_SERVER['QUERY_STRING'])) {
   $params = explode("&", $_SERVER['QUERY_STRING']);
   $newParams = array();
   foreach ($params as $param) {
-    if (stristr($param, "pageNum_rsAllTalent") == false && 
-        stristr($param, "totalRows_rsAllTalent") == false) {
+    if (stristr($param, "pageNum_rsJobsOpening") == false && 
+        stristr($param, "totalRows_rsJobsOpening") == false) {
       array_push($newParams, $param);
     }
   }
   if (count($newParams) != 0) {
-    $queryString_rsAllTalent = "&" . htmlentities(implode("&", $newParams));
+    $queryString_rsJobsOpening = "&" . htmlentities(implode("&", $newParams));
   }
 }
-$queryString_rsAllTalent = sprintf("&totalRows_rsAllTalent=%d%s", $totalRows_rsAllTalent, $queryString_rsAllTalent);
+$queryString_rsJobsOpening = sprintf("&totalRows_rsJobsOpening=%d%s", $totalRows_rsJobsOpening, $queryString_rsJobsOpening);
 ?>
 <?php
 //initialize the session
@@ -182,25 +154,21 @@ if ((isset($_SERVER['QUERY_STRING'])) && ($_SERVER['QUERY_STRING'] != "")){
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta charset="utf-8" />
-  <!--[if IE]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
-  <title>Welcome to Jobsperak Portal</title>
-  <meta name="keywords" content="" />
-  <meta name="description" content="" />
-  <link rel="stylesheet" href="css/style.css" type="text/css" media="screen, projection" />
-
-
-
-
+	<meta charset="utf-8" />
+	<!--[if IE]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<title>Welcome to Jobsperak Portal</title>
+	<meta name="keywords" content="" />
+	<meta name="description" content="" />
+	<link rel="stylesheet" href="css/style.css" type="text/css" media="screen, projection" />
 </head>
 
 <body>
 
 
 
-  <header id="header">
+	<header id="header">
 
-    <div class="center">
+		<div class="center">
        <div id="logo" class="left" style="margin:10px 0px 0px 0px;">
           <a href="index.php" title="Home">
             <img src="../images/logo.png" alt="logo.png" border="0">
@@ -213,46 +181,67 @@ if ((isset($_SERVER['QUERY_STRING'])) && ($_SERVER['QUERY_STRING'] != "")){
         </div>
       <div class="clear"></div>
     </div><!-- .center -->
-    
-    <?php include("main_menu.php"); ?>
-  </header><!-- #header-->
+		
+		<?php include("main_menu.php"); ?>
+	</header><!-- #header-->
 
-  <div id="wrapper">
-  
-  <section id="middle">
+	<div id="wrapper">
+	
+	<section id="middle">
 
-      <div id="content_full" style="padding-top:10px;margin-top:30px;">
-              <h1 class="title">Browse the Talent</h1>
-              <p>There are <?php echo $totalRows_rsAllTalent ?> Talent(s).</p>
-              <?php if ($totalRows_rsAllTalent > 0) { // Show if recordset not empty ?>
+		  <div id="content_full" style="padding-top:10px;margin-top:30px;">
+          	  <h1 class="title">Browse Jobs Opening</h1>
+              <p>There are <?php echo $totalRows_rsJobsOpening ?> Job(s) opening.</p>
+              <?php if ($totalRows_rsJobsOpening > 0) { // Show if recordset not empty ?>
 
 
 
   <ul id="job-cards">
-    <?php while ($row_rsAllTalent = mysql_fetch_object($rsAllTalent)) { ?>
+    <?php while ($row_rsJobsOpening = mysql_fetch_object($rsJobsOpening)) { ?>
       <li>
 
         <div>
           
-          <div class="profile left" style="border:1px solid orange; width: 90px;height:115px; padding:5px; margin:10px">
+          <div class="profile left" style="border:0px solid orange; width: 90px;height:115px; padding:5px; margin:10px">
             
               <h2 class="titleImg"><?php echo ucwords($rowviewusrSQL->currName); ?></h2>
-              <div style="background-image:url('<?php echo $row_rsAllTalent->emp_pic; ?>'); width:110px; height:105px; background-repeat:no-repeat; background-position: top center; background-repeat:no-repeat; background-position: top center;  background-color:#f1f1f1">
+              <div style="background-image:url('<?php echo $row_rsJobsOpening->emp_pic; ?>'); width:110px; height:105px; background-repeat:no-repeat; background-position: top center; background-repeat:no-repeat; background-position: top center;  background-color:#f1f1f1">
                     
                     <!-- <img src="<?php echo $rowviewusrSQL->usrPicture; ?>" width="64" /> -->
 
                     </div>
 
           </div>
-          <div class="profile right" style="border:px solid purple;  width: 730px; margin:10px; padding:5px; ">
-        <div class="profile22 left" style="border:1px solid #4c4c4c;  width: 700px; height:180px; margin:10px; padding:5px; ">
-                <div class="talent"style="border:1px solid ;  width: 500px; height:150px; margin:10px; padding:5px;">
-                             </div>
-              
+          <div class="profile right" style="border:0px solid purple;  width: 750px; margin:10px; padding:5px; ">
+        <div class="profile22 left" style="border:0px solid #4c4c4c;  width: 560px; hight: margin:10px; padding:5px; ">
+                <table>
+                  <tr>
+                    <th>JOB POST</th>
+                    <td>:</td>
+                     <td width ="215"><?php echo $row_rsJobsOpening->ads_title ?></td>
+                     <th >DAY EXPIRED</th>
+                     <td>:</td>
+                     <td><?php echo date('d-m-Y', strtotime($row_rsJobsOpening->ads_date_expired)); ?></td>
 
-          
-        <div class="profile right" style="border:1px solid yellow;  width: 130px; margin:5px;">
-               <div style="float:center" class="button green"><h3 align="center"><a href="jobsAdsDetails.php?jobAdsId=<?php echo $row_rsAllTalent->ads_id; ?>">APPLY</a></h3></div>
+                  </tr>
+                  <tr>
+                    <th>LOCATION</th>
+                     <td>:</td>
+                     <td width ="215"><?php echo $row_rsJobsOpening->location_name ?></td>
+                     <th >SALARY SCALE</th>
+                     <td>:</td>
+                     <td>RM<?php echo $row_rsJobsOpening->ads_salary ?></td>
+                  </tr>
+                <tr>
+                    <th>REQUIREMENT</th>
+                     <td>:</td>
+                     <td><?php echo $row_rsJobsOpening->ads_details ?></td>
+                  </tr>
+
+               </table>
+          </div>  
+        <div class="profile right" style="border:0px solid yellow;  width: 130px; margin:10px; padding:5px; ">
+               <div style="float:center" class="button green"><h3 align="center"><a href="jobsAdsDetails.php?jobAdsId=<?php echo $row_rsJobsOpening->ads_id; ?>">APPLY</a></h3></div>
           </div> 
   <div class="clear"></div>
         </div>
@@ -268,28 +257,28 @@ if ((isset($_SERVER['QUERY_STRING'])) && ($_SERVER['QUERY_STRING'] != "")){
       <?php } ?>
 
   </ul>
-              <div class="paginate"><a href="<?php printf("%s?pageNum_rsAllTalent=%d%s", $currentPage, 0, $queryString_rsAllTalent); ?>">First</a> | <a href="<?php printf("%s?pageNum_rsAllTalent=%d%s", $currentPage, max(0, $pageNum_rsAllTalent - 1), $queryString_rsAllTalent); ?>">Previous</a> | <a href="<?php printf("%s?pageNum_rsAllTalent=%d%s", $currentPage, min($totalPages_rsAllTalent, $pageNum_rsAllTalent + 1), $queryString_rsAllTalent); ?>">Next</a> | <a href="<?php printf("%s?pageNum_rsAllTalent=%d%s", $currentPage, $totalPages_rsAllTalent, $queryString_rsAllTalent); ?>">Last</a> | 
-Records <?php echo ($startRow_rsAllTalent + 1) ?> to <?php echo min($startRow_rsAllTalent + $maxRows_rsAllTalent, $totalRows_rsAllTalent) ?> of <?php echo $totalRows_rsAllTalent ?></div>
+              <div class="paginate"><a href="<?php printf("%s?pageNum_rsJobsOpening=%d%s", $currentPage, 0, $queryString_rsJobsOpening); ?>">First</a> | <a href="<?php printf("%s?pageNum_rsJobsOpening=%d%s", $currentPage, max(0, $pageNum_rsJobsOpening - 1), $queryString_rsJobsOpening); ?>">Previous</a> | <a href="<?php printf("%s?pageNum_rsJobsOpening=%d%s", $currentPage, min($totalPages_rsJobsOpening, $pageNum_rsJobsOpening + 1), $queryString_rsJobsOpening); ?>">Next</a> | <a href="<?php printf("%s?pageNum_rsJobsOpening=%d%s", $currentPage, $totalPages_rsJobsOpening, $queryString_rsJobsOpening); ?>">Last</a> | 
+Records <?php echo ($startRow_rsJobsOpening + 1) ?> to <?php echo min($startRow_rsJobsOpening + $maxRows_rsJobsOpening, $totalRows_rsJobsOpening) ?> of <?php echo $totalRows_rsJobsOpening ?></div>
                 <?php } // Show if recordset not empty ?>
           </div><!-- #content-->
-  
-      <!-- <aside id="sideRight"> -->
-              <?php //include('full_content_sidebar.php'); ?>
+	
+		  <!-- <aside id="sideRight"> -->
+          	  <?php //include('full_content_sidebar.php'); ?>
           <!-- </aside> -->
-      <!-- aside -->
-      <!-- #sideRight -->
+			<!-- aside -->
+			<!-- #sideRight -->
 
-    
+		
 
-  </section><!-- #middle-->
+	</section><!-- #middle-->
 
-  </div><!-- #wrapper-->
+	</div><!-- #wrapper-->
 
-  <footer id="footer">
-    <div class="center">
-      <?php include("footer.php"); ?>
-    </div><!-- .center -->
-  </footer><!-- #footer -->
+	<footer id="footer">
+		<div class="center">
+			<?php include("footer.php"); ?>
+		</div><!-- .center -->
+	</footer><!-- #footer -->
 
 
 
@@ -298,5 +287,5 @@ Records <?php echo ($startRow_rsAllTalent + 1) ?> to <?php echo min($startRow_rs
 <?php
 mysql_free_result($rsTenLatestJob);
 
-mysql_free_result($rsAllTalent);
+mysql_free_result($rsJobsOpening);
 ?>
