@@ -21,7 +21,7 @@ $server = 'http://pathfinder.my';*/
 $dbuser = 'root';
 $dbpwd	= '';
 $dbhost = 'localhost';
-$dbname = 'talentlo_livedb';
+$dbname = 'talentlo';
 $server = 'http://localhost/zing.my';
 
 
