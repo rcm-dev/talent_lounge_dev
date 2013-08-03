@@ -1,41 +1,49 @@
-<?php require_once('Connections/conJobsPerak.php'); ?>
-<?php
-//initialize the session
-if (!isset($_SESSION)) {
-  session_start();
+<?php  
+
+
+/* Include header */
+include 'header.php';
+include 'class/short.php';
+
+function shortUpdate($text) { 
+
+    // Change to the number of characters you want to display 
+    $chars = 90; 
+
+    $text = $text." "; 
+    $text = substr($text,0,$chars); 
+    $text = substr($text,0,strrpos($text,' '));
+
+    if ($chars > 90) {
+      $text = $text."...";
+    }
+    else {
+      $text = $text."";
+    }
+
+
+    return $text; 
+
 }
 
-// ** Logout the current user. **
-$logoutAction = $_SERVER['PHP_SELF']."?doLogout=true";
-if ((isset($_SERVER['QUERY_STRING'])) && ($_SERVER['QUERY_STRING'] != "")){
-  $logoutAction .="&". htmlentities($_SERVER['QUERY_STRING']);
+// Function seo friendly
+function seo_url($string) 
+{
+
+  $seoname = preg_replace('/\%/',' percentage',$string); 
+  $seoname = preg_replace('/\@/',' at ',$seoname); 
+  $seoname = preg_replace('/\&/',' and ',$seoname);
+  $seoname = preg_replace('/\s[\s]+/','-',$seoname);    // Strip off multiple spaces 
+  $seoname = preg_replace('/[\s\W]+/','-',$seoname);    // Strip off spaces and non-alpha-numeric 
+  $seoname = preg_replace('/^[\-]+/','',$seoname); // Strip off the starting hyphens 
+  $seoname = preg_replace('/[\-]+$/','',$seoname); // // Strip off the ending hyphens  
+  //$seoname = trim(str_replace(range(0,9),'',$seoname));
+  $seoname = strtolower($seoname);
+
+  echo $seoname;
 }
 
-if ((isset($_GET['doLogout'])) &&($_GET['doLogout']=="true")){
-  //to fully log out a visitor we need to clear the session varialbles
-  $_SESSION['MM_Username'] = NULL;
-  $_SESSION['MM_UserGroup'] = NULL;
-  $_SESSION['PrevUrl'] = NULL;
-  $_SESSION['MM_UserID'] = NULL;
-  unset($_SESSION['MM_Username']);
-  unset($_SESSION['MM_UserGroup']);
-  unset($_SESSION['PrevUrl']);
-  unset($_SESSION['MM_UserID']);
-	
-  $logoutGoTo = "index.php";
-  if ($logoutGoTo) {
-    header("Location: $logoutGoTo");
-    exit;
-  }
-}
-?>
-<?php 
-//initialize the session
-if (!isset($_SESSION)) {
-  session_start();
-}
-?>
-<?php
+
 if (!function_exists("GetSQLValueString")) {
 function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
 {
@@ -67,9 +75,9 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
 }
 }
 
-mysql_select_db($database_conJobsPerak, $conJobsPerak);
+mysql_select_db($dbname, $db);
 $query_rsTenLatestJob = "SELECT ads_id, ads_title FROM jp_ads WHERE ads_enable_view = 1 ORDER BY ads_date_posted DESC";
-$rsTenLatestJob = mysql_query($query_rsTenLatestJob, $conJobsPerak) or die(mysql_error());
+$rsTenLatestJob = mysql_query($query_rsTenLatestJob, $db) or die(mysql_error());
 $row_rsTenLatestJob = mysql_fetch_assoc($rsTenLatestJob);
 $totalRows_rsTenLatestJob = mysql_num_rows($rsTenLatestJob);
 
@@ -77,10 +85,10 @@ $colname_rsEmployerDetails = "-1";
 if (isset($_GET['emp_id'])) {
   $colname_rsEmployerDetails = (int) stripslashes($_GET['emp_id']);
 }
-mysql_select_db($database_conJobsPerak, $conJobsPerak);
+mysql_select_db($dbname, $db);
 $query_rsEmployerDetails = sprintf("Select   jp_employer.*, mj_users.*,  jp_industry.indus_name From   jp_employer Inner Join   jp_industry On jp_employer.emp_industry_id_fk = jp_industry.indus_id 
   Inner Join mj_users On mj_users.users_id = jp_employer.users_id_fk Where   jp_employer.emp_id = %s", GetSQLValueString($colname_rsEmployerDetails, "int"));
-$rsEmployerDetails = mysql_query($query_rsEmployerDetails, $conJobsPerak) or die(mysql_error());
+$rsEmployerDetails = mysql_query($query_rsEmployerDetails, $db) or die(mysql_error());
 $row_rsEmployerDetails = mysql_fetch_assoc($rsEmployerDetails);
 $totalRows_rsEmployerDetails = mysql_num_rows($rsEmployerDetails);
 
@@ -95,10 +103,10 @@ $colname_rsEmployerJobLists = "-1";
 if (isset($_GET['emp_id'])) {
   $colname_rsEmployerJobLists = $_GET['emp_id'] ;
 }
-mysql_select_db($database_conJobsPerak, $conJobsPerak);
+mysql_select_db($dbname, $db);
 $query_rsEmployerJobLists = sprintf("Select   jp_ads.ads_id,   jp_ads.ads_title,   jp_ads.emp_id_fk,   jp_ads.ads_enable_view,   jp_ads.ads_date_published From   jp_ads Where   jp_ads.emp_id_fk = %s And   jp_ads.ads_enable_view = 1 Order By   jp_ads.ads_date_published Desc", GetSQLValueString($colname_rsEmployerJobLists, "int"));
 $query_limit_rsEmployerJobLists = sprintf("%s LIMIT %d, %d", $query_rsEmployerJobLists, $startRow_rsEmployerJobLists, $maxRows_rsEmployerJobLists);
-$rsEmployerJobLists = mysql_query($query_limit_rsEmployerJobLists, $conJobsPerak) or die(mysql_error());
+$rsEmployerJobLists = mysql_query($query_limit_rsEmployerJobLists, $db) or die(mysql_error());
 $row_rsEmployerJobLists = mysql_fetch_assoc($rsEmployerJobLists);
 
 if (isset($_GET['totalRows_rsEmployerJobLists'])) {
@@ -112,85 +120,26 @@ $totalPages_rsEmployerJobLists = ceil($totalRows_rsEmployerJobLists/$maxRows_rsE
 
 
 
-
-
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-	<meta charset="utf-8" />
-	<!--[if IE]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
-	<title>Welcome to Jobsperak Portal</title>
-	<meta name="keywords" content="" />
-	<meta name="description" content="" />
-	<link rel="stylesheet" href="css/style.css" type="text/css" media="screen, projection" />
-    <script language="javascript" src="js/jquery-1.7.1.min.js"></script>
-
-    <script src="http://maps.google.com/maps/api/js?sensor=true" type="text/javascript"></script>
-
-<script src="../js/ui/min/jquery.ui.map.full.min.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-$(document).ready(function(){
-
-        $(function() {
-                // Also works with: var yourStartLatLng = '59.3426606750, 18.0736160278';
-                // var yourStartLatLng = new google.maps.LatLng(59.3426606750, 18.0736160278);
-                // $('#map_canvas').gmap({'center': yourStartLatLng});
-
-                $('#map_canvas').gmap().bind('init', function(ev, map) {
-                $('#map_canvas').gmap('addMarker', {'position': '<?php echo $row_rsEmployerDetails['latitud']; ?>,<?php echo $row_rsEmployerDetails['magnitud']; ?>', 'bounds': true}).click(function() {
-                  $('#map_canvas').gmap('openInfoWindow', {'content': 'Hello World!'}, this);
-                });
-              });
-        });
-
-
-      });
-</script>
-
-<style>
-  .section{
-    font color:#80ff00;
-    align:"center";
-  }
-
-  .social{
-    align:"center";
-  }
-
- </style>
-
-</head>
-
-<body>
+<div id="filterSection">
+  <div class="center" style="padding:2px 0px">
+    <div style="padding-left: 8px;">
+      Filter by:
+    </div>
+  </div>
+</div>
 
 
 
-	<header id="header">
 
-		<div class="center">
-       <div id="logo" class="left" style="margin:10px 0px 0px 0px;">
-          <a href="index.php" title="Home">
-            <img src="../images/logo.png" alt="logo.png" border="0">
-          </a>
-          
-        </div><!-- /left -->
+  <div class="center">
+    
 
-      <div class="right">
-            <?php include 'session_checking_panel.php'; ?>
-        </div>
-      <div class="clear"></div>
-    </div><!-- .center -->
-		
-		<?php include("main_menu.php"); ?>
-	</header><!-- #header-->
+  <div id="wrapper">
+  
+  <section id="middle">
 
-	<div id="wrapper">
-	
-	<section id="middle">
-
-		  <div id="content" class="search_container" style="width:610px; padding-top:10px;margin-top:30px;">
-          	 <!--  Viewing : <strong><?php echo ucfirst($_GET['employer']); ?></strong> -->
+      <div id="content" class="search_container" style="width:610px; padding-top:10px;margin-top:30px;">
+             <!--  Viewing : <strong><?php echo ucfirst($_GET['employer']); ?></strong> -->
               <?php if ($totalRows_rsEmployerDetails > 0) { // Show if recordset not empty ?>
   <div class="master_details">
     <table>
@@ -346,38 +295,85 @@ $(document).ready(function(){
 
   <?php } // Show if recordset not empty ?>
   <?php if ($totalRows_rsEmployerDetails == 0) { // Show if recordset empty ?>
-  	<div class="master_details"><p>No list in our Database.</p></div>
+    <div class="master_details"><p>No list in our Database.</p></div>
   <?php } // Show if recordset empty ?>
           </div><!-- #content-->
-	
-		 <!--  <aside id="sideRight">
-          	  <?php //include('full_content_sidebar.php'); ?>
+  
+     <!--  <aside id="sideRight">
+              <?php //include('full_content_sidebar.php'); ?>
           </aside>
- -->			<!-- aside -->
-			<!-- #sideRight -->
-		
+ -->      <!-- aside -->
+      <!-- #sideRight -->
+    
 </div>
-	</section><!-- #middle-->
+  </section><!-- #middle-->
 
 
 </div>
-	</div><!-- #wrapper-->
+  </div>
+</div>
 
 
-	<!-- <footer id="footer">
-		<div class="center">
-			<?php //include("footer.php"); ?>
-		</div> 
-	<!-- </footer> --><!-- -->
 
 
-</body>
-</html>
 
-<?php
-mysql_free_result($rsTenLatestJob);
+<input type="hidden" name="page_title" value="Training" id="page_title" />
 
-mysql_free_result($rsEmployerDetails);
+<script>
+$(document).ready(function(){
 
-mysql_free_result($rsEmployerJobLists);
+  /*$('#intervalStream').load('ajax/ajax-landing-stream.php');
+    
+   function test () {
+      console.log('RUN');
+      $('#intervalStream').load('ajax/ajax-landing-stream.php');
+      //$('#ImgOne').fadeOut(4000).fadeIn(4000);
+   }
+
+   var refreshId = setInterval(test, 5000);*/
+
+
+   /* vertical ticker */
+  $('#intervalStream').totemticker({
+    row_height  : '85px',
+  });
+   /*-------------------------------------------------------------------*/
+
+
+
+   /* tipsy */
+  $('.idea-new-ui').find('li img').tipsy({gravity: 's'});
+
+  $('.book-ui').find('li img').tipsy({gravity: 's'});
+
+  $('.ideaMisc').find('div .ic_attachment_grey').tipsy({gravity: 's'});
+
+
+
+
+  /* Change services */
+  $('#searchsector').change(function(){
+
+    var sectorID = $(this).val();
+  
+
+    $('#searchProduct').load('ajax/ajax-selectsector.php?sectorid='+sectorID);
+    console.log(sectorID);
+    
+
+  });
+
+
+  $('.flexslider').flexslider({
+      animation: "fade"
+    });
+
+
+});
+</script>
+<?php  
+
+/* Include header */
+include 'footer.php';
+
 ?>

@@ -1,11 +1,49 @@
-<?php require_once 'Connections/conJobsPerak.php'; ?>
+<?php  
 
 
-<?php
-//initialize the session
-// if ( !isset( $_SESSION ) ) {
-//   session_start();
-// }
+/* Include header */
+include 'header.php';
+include 'class/short.php';
+
+function shortUpdate($text) { 
+
+    // Change to the number of characters you want to display 
+    $chars = 90; 
+
+    $text = $text." "; 
+    $text = substr($text,0,$chars); 
+    $text = substr($text,0,strrpos($text,' '));
+
+    if ($chars > 90) {
+      $text = $text."...";
+    }
+    else {
+      $text = $text."";
+    }
+
+
+    return $text; 
+
+}
+
+// Function seo friendly
+function seo_url($string) 
+{
+
+  $seoname = preg_replace('/\%/',' percentage',$string); 
+  $seoname = preg_replace('/\@/',' at ',$seoname); 
+  $seoname = preg_replace('/\&/',' and ',$seoname);
+  $seoname = preg_replace('/\s[\s]+/','-',$seoname);    // Strip off multiple spaces 
+  $seoname = preg_replace('/[\s\W]+/','-',$seoname);    // Strip off spaces and non-alpha-numeric 
+  $seoname = preg_replace('/^[\-]+/','',$seoname); // Strip off the starting hyphens 
+  $seoname = preg_replace('/[\-]+$/','',$seoname); // // Strip off the ending hyphens  
+  //$seoname = trim(str_replace(range(0,9),'',$seoname));
+  $seoname = strtolower($seoname);
+
+  echo $seoname;
+}
+
+
 
 // ** Logout the current user. **
 $logoutAction = $_SERVER['PHP_SELF']."?doLogout=true";
@@ -33,9 +71,9 @@ if ( ( isset( $_GET['doLogout'] ) ) &&( $_GET['doLogout']=="true" ) ) {
 ?>
 <?php
 //initialize the session
-if ( !isset( $_SESSION ) ) {
-  session_start();
-}
+// if ( !isset( $_SESSION ) ) {
+//   session_start();
+// }
 ?>
 <?php
 if ( !function_exists( "GetSQLValueString" ) ) {
@@ -126,7 +164,7 @@ $rowviewusrSQL = mysql_fetch_object($rusrSQL);
 
 //*********
 
-mysql_select_db( $database_conJobsPerak, $conJobsPerak );
+mysql_select_db( $dbname,$db );
 $usrSQL = "SELECT
   mj_users.user_pic As usrPicture,
   mj_users.usr_last_login As setLastlogin,
@@ -176,7 +214,7 @@ $rowusrSQL = mysql_fetch_object( $rusrSQL );
 
 
 
-mysql_select_db( $database_conJobsPerak, $conJobsPerak );
+mysql_select_db( $dbname,$db );
 $randProject  = "SELECT
   mj_users.*,
   jp_employer.*,
@@ -195,15 +233,15 @@ $rrandProject = mysql_query( $randProject );
 $row_rrandProject = mysql_fetch_assoc( $rrandProject );
 $totalRows_rrandProject = mysql_num_rows( $rrandProject );
 
-mysql_select_db( $database_conJobsPerak, $conJobsPerak );
+mysql_select_db( $dbname,$db );
 $query_rsIndustry = "SELECT * FROM jp_industry WHERE industry_parent = 0";
-$rsIndustry = mysql_query( $query_rsIndustry, $conJobsPerak ) or die( mysql_error() );
+$rsIndustry = mysql_query( $query_rsIndustry, $db ) or die( mysql_error() );
 $row_rsIndustry = mysql_fetch_assoc( $rsIndustry );
 $totalRows_rsIndustry = mysql_num_rows( $rsIndustry );
 
-mysql_select_db( $database_conJobsPerak, $conJobsPerak );
+mysql_select_db( $dbname,$db );
 $query_rsstate = "SELECT * FROM mj_state";
-$rsstate = mysql_query( $query_rsstate, $conJobsPerak ) or die( mysql_error() );
+$rsstate = mysql_query( $query_rsstate, $db ) or die( mysql_error() );
 $row_rsstate = mysql_fetch_assoc( $rsstate );
 $totalRows_rsstate = mysql_num_rows( $rsstate );
 //*********
@@ -211,9 +249,9 @@ $totalRows_rsstate = mysql_num_rows( $rsstate );
 
 
 
-mysql_select_db( $database_conJobsPerak, $conJobsPerak );
+mysql_select_db( $dbname,$db );
 $query_rsTenLatestJob = "SELECT ads_id, ads_title FROM jp_ads WHERE ads_enable_view = 1 ORDER BY ads_date_posted DESC";
-$rsTenLatestJob = mysql_query( $query_rsTenLatestJob, $conJobsPerak ) or die( mysql_error() );
+$rsTenLatestJob = mysql_query( $query_rsTenLatestJob, $db ) or die( mysql_error() );
 $row_rsTenLatestJob = mysql_fetch_assoc( $rsTenLatestJob );
 $totalRows_rsTenLatestJob = mysql_num_rows( $rsTenLatestJob );
 
@@ -228,7 +266,7 @@ $colname_rrandProject = "-1";
 if ( isset( $_GET['usr_id'] ) ) {
   $colname_rrandProject = $_GET['usr_id'];
 }
-mysql_select_db( $database_conJobsPerak, $conJobsPerak );
+mysql_select_db( $dbname,$db );
 $query_rrandProject = sprintf( "SELECT
   mj_users.*,
   jp_employer.*,
@@ -245,7 +283,7 @@ From
    Where
   mj_users.usr_lvl = 1 AND jp_employer.emp_featured = 1", GetSQLValueString( $colname_rrandProject, "int" ) );
 $query_limit_rrandProject = sprintf( "%s LIMIT %d, %d", $query_rrandProject, $startRow_rrandProject, $maxRows_rrandProject );
-$rrandProject = mysql_query( $query_limit_rrandProject, $conJobsPerak ) or die( mysql_error() );
+$rrandProject = mysql_query( $query_limit_rrandProject, $db ) or die( mysql_error() );
 $row_rrandProject = mysql_fetch_assoc( $rrandProject );
 
 if ( isset( $_GET['totalRows_rrandProject'] ) ) {
@@ -283,42 +321,20 @@ height:220px;
    </style>
 
 
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-  <meta charset="utf-8" />
-  <!--[if IE]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
-  <title>Welcome to Jobsperak Portal</title>
-  <meta name="keywords" content="" />
-  <meta name="description" content="" />
-  <link rel="stylesheet" href="css/style.css" type="text/css" media="screen, projection" />
-    <script language="javascript" src="js/jquery-1.7.1.min.js"></script>
-</head>
 
-<body>
+<div id="filterSection">
+  <div class="center" style="padding:2px 0px">
+    <div style="padding-left: 8px;">
+      Filter by:
+    </div>
+  </div>
+</div>
 
 
 
-  <header id="header">
-
-    <div class="center">
-       <div id="logo" class="left" style="margin:10px 0px 0px 0px;">
-          <a href="index.php" title="Home">
-            <img src="../images/logo.png" alt="logo.png" border="0">
-          </a>
-
-        </div><!-- /left -->
-
-      <div class="right">
-            <?php include 'session_checking_panel.php'; ?>
-        </div>
-      <div class="clear"></div>
-      </div><!-- .center -->
-
-
-    <?php include "main_menu.php"; ?>
-  </header><!-- #header-->
-<div class="companySection">
+<div>
+  <div class="center">
+    <div class="companySection">
   <div id="wrapper" style="padding:30px 0px;">
 
   <section id="middle">
@@ -395,7 +411,7 @@ height:220px;
                                 } else { 
 
                                 ?>
-    <ul id="job-cards">
+    <ul id="job-cards2">
     <?php do { ?>
       <li>
         <div>
@@ -530,145 +546,70 @@ height:220px;
 
   </div><!-- #wrapper-->
 </div>
-  <!-- <footer id="footer">
-    <div class="center">
-      <?php //include "footer.php"; ?>
-    </div>
-  </footer> --><!-- #footer -->
+  </div>
+</div>
 
 
-<script type="text/javascript">
+
+
+
+<input type="hidden" name="page_title" value="Training" id="page_title" />
+
+<script>
 $(document).ready(function(){
 
-
-    $('#Check').click(function(){
-    $('#topTableCaption').hide();    
-
-    var catID = $('#query_company').val();
-    var stateID = $('#query_stat').val();
-
-
-    var dataString = 'catID='+catID+'&stateID=' + stateID;
-
-    console.log(dataString);
-
-
-    $('#topTableCaption1').html('loading....').fadeIn().load('ajaxDirList.php?'+dataString);
-
-    return false;
-
-
-
-
-    }); 
-
-
-
-  /* request friends */
-  $('#send-request-friend').click(function(){
+  /*$('#intervalStream').load('ajax/ajax-landing-stream.php');
     
-    var getuserviewid = $('#getviewuserid').val();
-    var currUsrId   = $('#currUsrId').val();
+   function test () {
+      console.log('RUN');
+      $('#intervalStream').load('ajax/ajax-landing-stream.php');
+      //$('#ImgOne').fadeOut(4000).fadeIn(4000);
+   }
 
-    $.ajax({
-        
-      type: "POST",
-      url: "ajax/friend-requested.php",
-      data: 'getuserviewid=' + getuserviewid + '&currUsrId=' + currUsrId,
-      cache: false,
+   var refreshId = setInterval(test, 5000);*/
 
-      success: function(html){
 
-        var url_to_load = 'users.php?uid=';
-        //$('#followFriendBtn').load(url_to_load+getuserviewid+ ' #followFriendBtn');
-        $('#send-request-friend').hide();
-        $('#followFriendBtn').fadeIn('slow').append(html);
-        //console.log(url_to_load + 'DONE');
-        
-      }
+   /* vertical ticker */
+  $('#intervalStream').totemticker({
+    row_height  : '85px',
+  });
+   /*-------------------------------------------------------------------*/
 
-    });
+
+
+   /* tipsy */
+  $('.idea-new-ui').find('li img').tipsy({gravity: 's'});
+
+  $('.book-ui').find('li img').tipsy({gravity: 's'});
+
+  $('.ideaMisc').find('div .ic_attachment_grey').tipsy({gravity: 's'});
+
+
+
+
+  /* Change services */
+  $('#searchsector').change(function(){
+
+    var sectorID = $(this).val();
+  
+
+    $('#searchProduct').load('ajax/ajax-selectsector.php?sectorid='+sectorID);
+    console.log(sectorID);
+    
 
   });
-   
-
-/* Edit profile fancy box */
-    $('#editProfile').fancybox({
-        'titlePosition'   : 'inside',
-
-        'transitionIn'    : 'none',
-
-        'transitionOut'   : 'none',
-
-        'type'              : 'iframe'
-      });
 
 
-
-    /* Register */
-    $("#iregister").fancybox({
-
-
-        'autoScale'         : false,
-
-        'height'            : '70%',
-
-        'transitionIn'      : 'none',
-
-        'transitionOut'     : 'none',
-
-        'titlePosition'   : 'none',
-
-        'type'              : 'iframe'
-
-    });
-
-
-    /* login */
-    $("#ilogin").fancybox({
-
-        'height'            : '70%',
-
-        'autoScale'         : true,
-
-        'transitionIn'      : 'none',
-
-        'transitionOut'     : 'none',
-
-        'titlePosition'   : 'none',
-
-        'type'              : 'iframe'
-
-    });
-
-
-    /* public figure */
-    $('.public').fancybox({
-
-        'height'            : '70%',
-
-        'autoScale'         : true,
-
-        'transitionIn'      : 'none',
-
-        'transitionOut'     : 'none',
-
-        'titlePosition'   : 'none',
-
-        'type'              : 'iframe'
-
+  $('.flexslider').flexslider({
+      animation: "fade"
     });
 
 
 });
 </script>
+<?php  
 
-</body>
-</html>
-<?php
-mysql_free_result( $rsTenLatestJob );
+/* Include header */
+include 'footer.php';
 
-mysql_free_result( $rrandProject );
 ?>
-
-

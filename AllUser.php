@@ -325,6 +325,11 @@ if ((isset($_SERVER['QUERY_STRING'])) && ($_SERVER['QUERY_STRING'] != "")){
           </div>
 
 
+          <div style="border:1px; margin:10px;"><a href="users.php?emp_id=<?php echo $rowviewusrSQL['usr_id'] ?>" class="tl-btn-blue">View Profle!</a>
+           </div>
+   
+
+
 
 
 <div class="clear"></div>
@@ -418,7 +423,32 @@ $(document).ready(function(){
 
 	$('.ideaMisc').find('div .ic_attachment_grey').tipsy({gravity: 's'});
 
+/* request friends */
+  $('#send-request-friend').click(function(){
+    
+    var getuserviewid = $('#getviewuserid').val();
+    var currUsrId   = $('#currUsrId').val();
 
+    $.ajax({
+        
+      type: "POST",
+      url: "ajax/friend-requested.php",
+      data: 'getuserviewid=' + getuserviewid + '&currUsrId=' + currUsrId,
+      cache: false,
+
+      success: function(html){
+
+        var url_to_load = 'users.php?uid=';
+        //$('#followFriendBtn').load(url_to_load+getuserviewid+ ' #followFriendBtn');
+        $('#send-request-friend').hide();
+        $('#followFriendBtn').fadeIn('slow').append(html);
+        //console.log(url_to_load + 'DONE');
+        
+      }
+
+    });
+
+  });
 
 
 	/* Change services */
