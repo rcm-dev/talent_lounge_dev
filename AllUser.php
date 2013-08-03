@@ -1,15 +1,33 @@
 <?php  
 
-/**
- * User preview
- * get by user id
- * select statement
- * display as user view
- */
-include 'header.php';
-include 'db/db-connect.php';
 
-function sqlInjectString($string) 
+/* Include header */
+include 'header.php';
+include 'class/short.php';
+
+function shortUpdate($text) { 
+
+    // Change to the number of characters you want to display 
+    $chars = 90; 
+
+    $text = $text." "; 
+    $text = substr($text,0,$chars); 
+    $text = substr($text,0,strrpos($text,' '));
+
+    if ($chars > 90) {
+    	$text = $text."...";
+    }
+    else {
+    	$text = $text."";
+    }
+
+
+    return $text; 
+
+}
+
+// Function seo friendly
+function seo_url($string) 
 {
 
 	$seoname = preg_replace('/\%/',' percentage',$string); 
@@ -21,14 +39,30 @@ function sqlInjectString($string)
 	$seoname = preg_replace('/[\-]+$/','',$seoname); // // Strip off the ending hyphens  
 	//$seoname = trim(str_replace(range(0,9),'',$seoname));
 	$seoname = strtolower($seoname);
-	mysql_real_escape_string(trim(htmlentities(htmlspecialchars($seoname))));
 
-	return $seoname;
+	echo $seoname;
 }
 
-$get_user_id	=	(int) sqlInjectString($_GET['uid']);
 
-$usrSQL = "SELECT
+
+
+$currentPage = $_SERVER["PHP_SELF"];
+
+mysql_select_db($dbname, $db);
+$query_rsTenLatestJob = "SELECT ads_id, ads_title FROM jp_ads WHERE ads_enable_view = 1 ORDER BY ads_date_posted DESC";
+$rsTenLatestJob = mysql_query($query_rsTenLatestJob, $db) or die(mysql_error());
+$row_rsTenLatestJob = mysql_fetch_assoc($rsTenLatestJob);
+$totalRows_rsTenLatestJob = mysql_num_rows($rsTenLatestJob);
+
+$maxRows_rsAllTalent = 30;
+$pageNum_rsAllTalent = 0;
+if (isset($_GET['pageNum_rsAllTalent'])) {
+  $pageNum_rsAllTalent = $_GET['pageNum_rsAllTalent'];
+}
+$startRow_rsAllTalent = $pageNum_rsAllTalent * $maxRows_rsAllTalent;
+
+mysql_select_db($dbname, $db);
+$query_rsAllTalent = "SELECT
   mj_users.user_pic As usrPicture,
   mj_users.usr_last_login As setLastlogin,
   mj_users.usr_email As setemail,
@@ -56,125 +90,175 @@ From
   mj_country On mj_users.mj_country_id_fk = mj_country.country_id Inner Join
   jp_skills On jp_skills.user_id_fk = mj_users.users_id Inner Join
   jp_education On jp_education.user_id_fk = mj_users.users_id Inner Join
-  jp_edu_lists On jp_education.edu_qualification = jp_edu_lists.edu_id 
-  ";
+  jp_edu_lists On jp_education.edu_qualification = jp_edu_lists.edu_id ";
+$query_limit_rsAllTalent = sprintf("%s LIMIT %d, %d", $query_rsAllTalent, $startRow_rsAllTalent, $maxRows_rsAllTalent);
+$rsAllTalent = mysql_query($query_limit_rsAllTalent, $db) or die(mysql_error());
+$row_rsAllTalent = mysql_fetch_assoc($rsAllTalent);
 
+if (isset($_GET['totalRows_rsAllTalent'])) {
+  $totalRows_rsAllTalent = $_GET['totalRows_rsAllTalent'];
+} else {
+  $all_rsAllTalent = mysql_query($query_rsAllTalent);
+  $totalRows_rsAllTalent = mysql_num_rows($all_rsAllTalent);
+}
+$totalPages_rsAllTalent = ceil($totalRows_rsAllTalent/$maxRows_rsAllTalent)-1;
 
-$rusrSQL = mysql_query($usrSQL);
-$rowviewusrSQL = mysql_fetch_object($rusrSQL);
+$queryString_rsAllTalent = "";
+if (!empty($_SERVER['QUERY_STRING'])) {
+  $params = explode("&", $_SERVER['QUERY_STRING']);
+  $newParams = array();
+  foreach ($params as $param) {
+    if (stristr($param, "pageNum_rsAllTalent") == false && 
+        stristr($param, "totalRows_rsAllTalent") == false) {
+      array_push($newParams, $param);
+    }
+  }
+  if (count($newParams) != 0) {
+    $queryString_rsAllTalent = "&" . htmlentities(implode("&", $newParams));
+  }
+}
+$queryString_rsAllTalent = sprintf("&totalRows_rsAllTalent=%d%s", $totalRows_rsAllTalent, $queryString_rsAllTalent);
+?>
+<?php
+//initialize the session
+if (!isset($_SESSION)) {
+  session_start();
+}
 
-// ==================================================================
-//
-// HTML Goes here
-//
-// ------------------------------------------------------------------
+// ** Logout the current user. **
+$logoutAction = $_SERVER['PHP_SELF']."?doLogout=true";
+if ((isset($_SERVER['QUERY_STRING'])) && ($_SERVER['QUERY_STRING'] != "")){
+  $logoutAction .="&". htmlentities($_SERVER['QUERY_STRING']);
+}
 
 ?>
+
 <div id="filterSection">
 	<div class="center" style="padding:2px 0px">
 		<div style="padding-left: 8px;">
-			<form action="showcase.php" method="get">
-				<table>
-					<tr>
-						<td>Filter by Industry</td>
-						<td>
-							<select name="industry" id="industry">
-								<option value="0">All Indstries</option>
-							</select>
-						</td>
-						<td>Profession</td>
-						<td>
-							<select name="profession" id="profession">
-								<option value="0">All Professions</option>
-							</select>
-						</td>
-						<td>Location</td>
-						<td>
-							<select name="location" id="locatio">
-								<option value="0">All Locations</option>
-							</select>
-						</td>
-						<td>Categories</td>
-						<td>
-							<select name="Categories" id="Categories">
-								<option value="0">All Categories</option>
-							</select>
-						</td>
-						<td>Keyword</td>
-						<td>
-							<input type="text" name="q">
-						</td>
-						<td>
-							<input type="submit">
-						</td>
-					</tr>
-				</table>
-			</form>
+			Filter by:
 		</div>
 	</div>
 </div>
 
-<!-- <div id="content" class="<?php //if(!isset($_SESSION['usr_id'])) { echo "topfix"; } ?>"> -->
-<div id="content">
 
-	<?php //include 'quickpost.php'; ?>
+
+	<div class="center">
+		 <div id="wrapper">
+  
+  <section id="middle">
+
+      <div id="content_full" style="padding-top:10px;margin-top:30px;">
+              <h1 class="title">Browse the Talent</h1>
+              <p>There are <?php echo $totalRows_rsAllTalent ?> Talent(s).</p>
+              <?php if ($totalRows_rsAllTalent > 0) { // Show if recordset not empty ?>
+
+
+
+  <ul id="job-cards">
+    <?php while ($row_rsAllTalent = mysql_fetch_object($rsAllTalent)) { ?>
+      <li>
+
+        <div>
+          
+          <div class="profile left" style="border:0px solid orange; width: 110px;height:115px; padding:5px; margin:5px">
+            
+              <h2 class="titleImg"><?php echo ucwords($rowviewusrSQL->currName); ?></h2>
+              <div style="background-image:url('<?php echo $row_rsAllTalent->emp_pic; ?>'); width:110px; height:105px; background-repeat:no-repeat; background-position: top center; background-repeat:no-repeat; background-position: top center;  background-color:#f1f1f1">
+                    
+                    <!-- <img src="<?php echo $rowviewusrSQL->usrPicture; ?>" width="64" /> -->
+
+                    </div>
+
+          </div>
+          <div class="profile right" style="border:0px solid purple;  width: 730px;  height:200px; margin:10px; padding:5px; ">
+        <div class="profile22 left" style=" float:left; border:0px solid #4c4c4c;  width: 260px; height:180px; margin:10px; padding:5px; ">
+                  <table>
+                  <tr>
+                    <td>
+
 	
-	<div id="contentContainer" style="border:0px solid red;">
+                      <tr><td>NAME :</td><td><?php echo $row_rsAllTalent->currName ?></td> </tr>
+                      <tr><td>PROFESSION :</td><td><?php echo $row_rsAllTalent->Profession ?></td></tr>
+                      <tr><td>SKILLS :</td><td><?php echo $row_rsAllTalent->Skills ?></td></tr>
+                      <tr><td>EDUCATION :</td><td><?php echo $row_rsAllTalent->Education ?></td></tr>
+                      <tr><td>EMPLOYER :</td><td> <?php echo $row_rsAllTalent->WorkAt ?></td></tr>
+                      <tr><td>LOCATION :</td><td><?php echo $row_rsAllTalent->Location ?></td></tr>
+                      <tr></tr>
 
-		<div class="heading">
-			<h1 class="heading_title bebasTitle">Connect With Talents</h1>
-		</div>
-			<div style="border:1px solid #f1f1f1; background-color:#fff;">
+                    </td>
+                 </tr>               
 
-				<div class="user-misc-view" style="border:0px solid green">
-				
-					<div style="border-right:0px solid #e1e1e1; width: 100px; padding-bottom: 30px; margin-bottom: 20px;" class="left left-arrow">
-						
-						<div class="left-profile" style="padding:10px;">
-						<!-- <h3 style="font-weight: bold; color:#312F53">Profile</h3> -->
+               </table>
+              
+              
+</div>
+<div class="profile23 left" style="float:right; border:0px solid #4c4c4c;  width: 400px; height:180px; margin:10px; padding:5px; ">
 
-						<div class="user-profile-view">
+     <div style="float:left; border:0px solid red; padding:10px;" >
+            <h3 style="font-weight: bold; color:#312F53" class="users_color">Network</h3>
+            <?php
 
-							<div class="mj-profile">
-								
-								<div class="leftprofile">
-											<?php 
-		
-		/***
-		 *  show no data rsFLists
-		 **/
-		
-		if($rowviewusrSQL == 0) { ?>
-		
-			<p>No Data</p>
-		
-		<?php } else { // End If no data for rsFLists ?>
-		
-		
-		<ul id="freelancer-list">
-			<?php 
-		
-			/***
-			 *  show data rsFLists
-			 **/
-		
-			while($rowviewusrSQL = mysql_fetch_object($rusrSQL)) { ?>
-				
-				<li>
+            // ==================================================================
+            //
+            // display friends
+            //
+            // ------------------------------------------------------------------
+            
+            $qFriend = "SELECT
+              mj_users.usr_name As friendName,
+              mj_users.usr_id As usrGetId,
+              mj_users.user_pic As usrPicture,
+              mj_users.usr_workat As WorkAt
+            From
+              mj_usr_network Inner Join
+              mj_users On mj_users.usr_id = mj_usr_network.usr_network_friend_usr_id_fk
+            Where
+              mj_usr_network.usr_network_usr_id_fk = '$get_user_id' And
+              mj_usr_network.usr_network_friend_usr_id_fk != '$get_user_id' And
+              mj_usr_network.usr_network_approved = 0";
 
-										<div style="background-image:url('<?php echo $rowviewusrSQL->usrPicture; ?>'); width:100px; height:100px; background-repeat:no-repeat; background-position: top center; background-size: 100%; background-color:#f1f1f1">
-										
-										<!-- <img src="<?php echo $rowviewusrSQL->usrPicture; ?>" width="64" /> -->
-								
-										</div>
-											<div><a href="connect_share_view.php?uid=<?php echo $rowviewusrSQL->usr_id; ?>" class="tl-btn-blue">View Profle!</a></div>
+            $rqFriend = mysql_query($qFriend);
+            $numrowqFriend = mysql_num_rows($rqFriend);
 
+            if ($numrowqFriend == 0) {
+              
+              echo "This user does not have any friends yet.";
 
- <div style="padding:10px; !important; background-color:#f4f4f4; text-align:right;">
-      
-     
-        <div id="followFriendBtn" style="border:0px solid red; float: right;">
-        <?php  
+            } else {
+
+              echo '<ul class="friendsUserView">';
+
+              while ($rowqFriend = mysql_fetch_object($rqFriend)) { ?>
+
+            <li>
+              <a href="users.php?uid=<?php echo $rowqFriend->usrGetId; ?>">
+              <div class="namePic" original-title="<?php echo $rowqFriend->friendName; ?>">
+                <div class="profile-pic48">
+                  <div style="width:48px; height:48px; background-position: top center; background-size: 100%; background-image:url('<?php echo $rowqFriend->usrPicture; ?>'); background-repeat: no-repeat;">
+                    
+                  </div>
+                  <!-- <img src="<?php echo $rowqFriend->usrPicture; ?>" width="48" /> -->
+                </div >
+              
+              </a>
+              <div class="clear"></div>
+            </li>
+
+            <?php
+
+              }
+
+              echo '</ul>';
+              
+            }
+
+            ?>
+            </div>
+
+             
+
+             <div style="float:right" class="button green">        <?php  
 
               // ==================================================================
               //
@@ -229,7 +313,7 @@ $rowviewusrSQL = mysql_fetch_object($rusrSQL);
 
                 
                   
-                  <a href="#" id="send-request-friend" >
+                  <a href="#" id="send-request-friend">
                   Follow <?php echo $rowviewusrSQL->currName; ?>
                   </a>
                   <input type="hidden" name="getviewuserid" id="getviewuserid" value="<?php echo $get_user_id; ?>">
@@ -239,296 +323,105 @@ $rowviewusrSQL = mysql_fetch_object($rusrSQL);
               
               <?php } ?>
           </div>
-          
-      </div><!-- / -->
-
-								</div>
-								<div class="name">
-															
-								</div>
-
-								<div class="clear"></div>
-
-								<div style="border:0px solid red; margin-top: 20px;" class="none">
-									<!-- <a href="#message-send" id="send-msg-btn" title="Send Message to <?php //echo $rowviewusrSQL->currName; ?>"><img src="images/sm.png" /></a> --><br/>
-								</div>
-
-							</div>
-						</div><!-- / center profile -->
-
-						
-						</div>
-
-			
-					</div><!-- / my profile -->
 
 
-					<div id="ProfileView" class="right" style="padding:5px; width: 300px; border-left:1px solid #f1f1f1">
-
-						<table border="0" cellpadding="3" cellspacing="3">
-						  <tr>
-						    <td colspan="3"><h2><?php echo ucwords($rowviewusrSQL->currName); ?></h2></td>
-						  </tr>
-						  <tr>
-						  	<td colspan="3"><span class="card_address_color">Profile</span></td>
-						  </tr>
-						  <tr>
-						    <td>Name</td>
-						    <td>&nbsp;</td>
-						    <td><?php echo $rowviewusrSQL->currName; ?></td>
-						  </tr>
-						  <tr>
-						    <td> Profession</td>
-						    <td>&nbsp;</td>
-						    <td><?php echo $rowviewusrSQL->Profession; ?></td>
-						  </tr>
-						  <tr>
-						    <td>Skills </td>
-						    <td>&nbsp;</td>
-						    <td><?php echo $rowviewusrSQL->Skills; ?></td>
-						  </tr>
-						  <tr>
-						    <td>Education </td>
-						    <td>&nbsp;</td>
-						    <td><?php echo $rowviewusrSQL->Education; ?></td>
-						  </tr>
-						  <tr>
-						    <td>Location</td>
-						    <td>&nbsp;</td>
-						    <td><?php echo $rowviewusrSQL->WorkAt; ?></td>
-						  </tr>
-						</table>
-					
+          <div style="border:1px; margin:10px;"><a href="users.php?emp_id=<?php echo $rowviewusrSQL['usr_id'] ?>" class="tl-btn-blue">View Profle!</a>
+           </div>
+   
 
 
-					</div><!-- /rightProfileView -->
-					
-				<div id="ProfileView2" class="right" style="padding:10px; width: 300px; border-left:1px solid #f1f1f1">
-
-										<div style="border:0px solid red; padding:10px;" class="right-profile">
 
 
-							
-						<h3 style="font-weight: bold; color:#312F53" class="users_color">Network</h3>
-						<?php
-
-						// ==================================================================
-						//
-						// display friends
-						//
-						// ------------------------------------------------------------------
-						
-						$qFriend = "SELECT
-						  mj_users.usr_name As friendName,
-						  mj_users.usr_id As usrGetId,
-						  mj_users.user_pic As usrPicture,
-						  mj_users.usr_workat As WorkAt
-						From
-						  mj_usr_network Inner Join
-						  mj_users On mj_users.usr_id = mj_usr_network.usr_network_friend_usr_id_fk
-						Where
-						  mj_usr_network.usr_network_usr_id_fk = '$get_user_id' And
-						  mj_usr_network.usr_network_friend_usr_id_fk != '$get_user_id' And
-						  mj_usr_network.usr_network_approved = 0";
-
-						$rqFriend = mysql_query($qFriend);
-						$numrowqFriend = mysql_num_rows($rqFriend);
-
-						if ($numrowqFriend == 0) {
-							
-							echo "This user does not have any friends yet.";
-
-						} else {
-
-							echo '<ul class="friendsUserView">';
-
-							while ($rowqFriend = mysql_fetch_object($rqFriend)) { ?>
-
-						<li>
-							<a href="users.php?uid=<?php echo $rowqFriend->usrGetId; ?>">
-							<div class="namePic" original-title="<?php echo $rowqFriend->friendName; ?>">
-								<div class="profile-pic48">
-									<div style="width:48px; height:48px; background-position: top center; background-size: 100%; background-image:url('<?php echo $rowqFriend->usrPicture; ?>'); background-repeat: no-repeat;">
-										
-									</div>
-									<!-- <img src="<?php echo $rowqFriend->usrPicture; ?>" width="48" /> -->
-								</div>
-							</div>
-							</a>
-							<div class="clear"></div>
-						</li>
-
-						<?php
-
-							}
-
-							echo '</ul>';
-							
-						}
-
-						?>
-						</div>
-	
-						
+<div class="clear"></div>
 
 
 
 
 
-						
-				</div>
-
-				<div id="rightProfileView" class="right" style="padding:3px; width: 90px; border-left:1px solid #f1f1f1">
-
-				</div>	
-
-					<div class="clear"></div>
 
 
-					<div class="clear"></div>
-				
-				</div><!-- / user-misc-view -->
-
-				<div class="clear"></div>
-
-			</div>
-
-		</div>
-</li>
-		
-			<?php } // End IF data rsFLists ?>
-		
-		</ul>
-
-		<?php } // End List of Freelance Job Posts ?>
-		
-	</div>
 
 
-	<br><br>
-			
-	<!-- /contentContainer -->
-<!-- /content
+        </div>
+        
+  <div class="clear"></div>
 
-<!-- send message -->
+               </div>
 
-<div id="send-msg-container" class="none">
-	<div id="message-send" style="height: 200px;">
-		<form id="form-message" method="post">
-			<label>To: </label><strong><?php echo ucfirst($rowviewusrSQL->currName); ?></strong><br/><br/>
-			<label>Message</label><br/>
-			<textarea name="sendmessagebody" id="sendmessagebody" style="height:90px;"></textarea><br/>
-			<input type="submit" value="Send Message" id="sm-button" class="button green" />
-			<input type="hidden" name="messageto" id="messageto" value="<?php echo $get_user_id; ?>" />
-			<input type="hidden" name="messageby" id="messageby" value="<?php echo $usr_id; ?>" />
-		</form>
-		<div id="messagesent" class="success none">Message Sent</div>
+
+
+  <div class="clear"></div>
+        </div>
+        
+     
+           
+      </li>
+      <?php } ?>
+
+  </ul>
+              <div class="paginate"><a href="<?php printf("%s?pageNum_rsAllTalent=%d%s", $currentPage, 0, $queryString_rsAllTalent); ?>">First</a> | <a href="<?php printf("%s?pageNum_rsAllTalent=%d%s", $currentPage, max(0, $pageNum_rsAllTalent - 1), $queryString_rsAllTalent); ?>">Previous</a> | <a href="<?php printf("%s?pageNum_rsAllTalent=%d%s", $currentPage, min($totalPages_rsAllTalent, $pageNum_rsAllTalent + 1), $queryString_rsAllTalent); ?>">Next</a> | <a href="<?php printf("%s?pageNum_rsAllTalent=%d%s", $currentPage, $totalPages_rsAllTalent, $queryString_rsAllTalent); ?>">Last</a> | 
+Records <?php echo ($startRow_rsAllTalent + 1) ?> to <?php echo min($startRow_rsAllTalent + $maxRows_rsAllTalent, $totalRows_rsAllTalent) ?> of <?php echo $totalRows_rsAllTalent ?></div>
+                <?php } // Show if recordset not empty ?>
+          </div><!-- #content-->
+  
+      <!-- <aside id="sideRight"> -->
+              <?php //include('full_content_sidebar.php'); ?>
+          <!-- </aside> -->
+      <!-- aside -->
+      <!-- #sideRight -->
+
+    
+
+  </section><!-- #middle-->
+
+  </div><!-- #wrapper-->
+</div>
+<?php
+?>
+
+
+
+
 	</div>
 </div>
 
-<!-- /send message -->
 
 
-<input type="hidden" name="page_title" value="<?php echo $rowviewusrSQL->currName; ?>" id="page_title" />
 
 
-<script type="text/javascript">
+
+
+
+<input type="hidden" name="page_title" value="Training" id="page_title" />
+
+<script>
 $(document).ready(function(){
-	
-	/*$('.user-misc-view').hover(function(){
-		
-		$('.user-misc-view .left-arrow .left-profile').fadeIn();
-		$('.user-misc-view .right-arrow .right-profile').fadeIn();
 
-	},function(){
-		
-		$('.user-misc-view .left-arrow .left-profile').fadeOut();
-		$('.user-misc-view .right-arrow .right-profile').fadeOut();
+	/*$('#intervalStream').load('ajax/ajax-landing-stream.php');
+    
+   function test () {
+   		console.log('RUN');
+   		$('#intervalStream').load('ajax/ajax-landing-stream.php');
+   		//$('#ImgOne').fadeOut(4000).fadeIn(4000);
+   }
 
-	});*/
+   var refreshId = setInterval(test, 5000);*/
 
-	$('#send-msg-btn').fancybox({
-		'opacity'		: true,
-		'overlayShow'	: true,
-		'transitionIn'	: 'elastic',
-		'transitionOut'	: 'none'
 
+   /* vertical ticker */
+	$('#intervalStream').totemticker({
+		row_height	:	'85px',
 	});
+   /*-------------------------------------------------------------------*/
 
 
-	$('#sm-button').click(function(){
-		
-		var sendmessagebody = $('#sendmessagebody').val();
 
-		if (sendmessagebody == '') {
-			alert('Enter your message');
-		} else {
+   /* tipsy */
+	$('.idea-new-ui').find('li img').tipsy({gravity: 's'});
 
-			var sendmessagebody = $('#sendmessagebody').val();
-			var messageto   	= $('#messageto').val();
-			var messageby   	= $('#currUsrId1').val();
+	$('.book-ui').find('li img').tipsy({gravity: 's'});
 
-			console.log('messageto=' + messageto + '&sendmessagebody=' + sendmessagebody + '&messageby=' + messageby);
-			
-			$.ajax({
-				
-				type: "POST",
-				url: "ajax/send-message.php",
-				data: 'messageto=' + messageto + '&sendmessagebody=' + sendmessagebody + '&messageby=' + messageby,
-				cache: false,
-
-				success: function(response){
-
-					if (response == 1) {
-
-						$('form#form-message').hide();
-						//console.log('send');
-
-						$('#messagesent').fadeIn();
-						$('#message-send').css('height', '60px');
-
-					} else {
-
-						console.log('not send');						
-					}
-					
-				}
-
-			});
-
-		}
-		return false;
-	});
-
-
-	/* request friends */
-	$('#send-request-friend').click(function(){
-		
-		var getuserviewid = $('#getviewuserid').val();
-		var currUsrId	  = $('#currUsrId').val();
-
-		$.ajax({
-				
-			type: "POST",
-			url: "ajax/friend-requested.php",
-			data: 'getuserviewid=' + getuserviewid + '&currUsrId=' + currUsrId,
-			cache: false,
-
-			success: function(html){
-
-				var url_to_load = 'users.php?uid=';
-				//$('#followFriendBtn').load(url_to_load+getuserviewid+ ' #followFriendBtn');
-				$('#send-request-friend').hide();
-				$('#followFriendBtn').fadeIn('slow').append(html);
-				//console.log(url_to_load + 'DONE');
-				
-			}
-
-		});
-
-	});
-
-
+	$('.ideaMisc').find('div .ic_attachment_grey').tipsy({gravity: 's'});
 
 /* request friends */
   $('#send-request-friend').click(function(){
@@ -557,44 +450,30 @@ $(document).ready(function(){
 
   });
 
-	/* tipsy */
-	$('.friendsUserView').find('li div.namePic').tipsy({gravity: 's'});
 
+	/* Change services */
+	$('#searchsector').change(function(){
 
-	/*rateup*/
-	$('#ratUp').click(function(){
+		var sectorID = $(this).val();
+	
 
-		var id = $('#currViewUsrID').val();
-
-		$.ajax({
-
-			url: "ajax/ajax-rate-up-user.php",
-			type: "POST",
-			data: "curruseridview="+id,
-
-			success: function(html) {
-				$('span#rateuptext').hide();
-				$('span#rateupresult').fadeIn().append(html);
-				//console.log(id);
-			}
-
-		});
-
-		return false;
+		$('#searchProduct').load('ajax/ajax-selectsector.php?sectorid='+sectorID);
+		console.log(sectorID);
+		
 
 	});
 
 
+	$('.flexslider').flexslider({
+	    animation: "fade"
+	  });
+
+
 });
 </script>
-
 <?php  
 
-/**
- * Include Footer
- */
-
+/* Include header */
 include 'footer.php';
-
 
 ?>
