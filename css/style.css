@@ -35,3 +35,52 @@ img.block {
 #next:hover{
 	background: url(../img/featured/arrowmo.png);
 }
+
+/*job opening*/
+.left { float:left; }
+.right { float:right; }
+.clear { clear: both; }
+
+
+.titleJob{
+	float: right;
+    border:1px solid blue;
+    height: 115px;
+    position: absolute;
+    width:600px;
+    margin:5px;
+    background-image: url('../../images/glossy-pic.png');
+    border-bottom: 1px solid #eaeaea;
+}
+
+.profile22{
+
+	-webkit-border-radius: 10px;
+-moz-border-radius: 10px;
+border-radius: 10px;
+background :#f1f1f1;
+}
+
+.profile23{
+
+	-webkit-border-radius: 10px;
+-moz-border-radius: 10px;
+border-radius: 10px;
+background :#f1f1f1;
+}
+
+ul#job-cards li {
+    list-style:none;
+    border:0px solid red;
+    background: white;
+    border-radius: 5px;
+    overflow:hidden;
+    text-align:left;
+    width: 900px;
+    box-shadow: 0px 1px 0px 0px rgba(0,0,0,.2);
+    margin-right: 26px;
+    margin-bottom: 20px;
+    display: inline-block;
+    vertical-align: top;
+    height:230px;
+}
