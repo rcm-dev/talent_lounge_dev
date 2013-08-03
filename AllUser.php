@@ -325,7 +325,7 @@ if ((isset($_SERVER['QUERY_STRING'])) && ($_SERVER['QUERY_STRING'] != "")){
           </div>
 
 
-          <div style="border:1px; margin:10px;"><a href="users.php?emp_id=<?php echo $rowviewusrSQL['usr_id'] ?>" class="tl-btn-blue">View Profle!</a>
+          <div style="border:1px; margin:10px;"><a href="connect_share_view.php?uid=<?php echo $row_rsAllTalent->usr_id;?>" class="tl-btn-blue">View Profle!</a>
            </div>
    
 

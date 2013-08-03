@@ -64,54 +64,12 @@ $rowviewusrSQL = mysql_fetch_object($rusrSQL);
 // ------------------------------------------------------------------
 
 ?>
-<div id="filterSection">
-	<div class="center" style="padding:2px 0px">
-		<div style="padding-left: 8px;">
-			<form action="showcase.php" method="get">
-				<table>
-					<tr>
-						<td>Filter by Industry</td>
-						<td>
-							<select name="industry" id="industry">
-								<option value="0">All Indstries</option>
-							</select>
-						</td>
-						<td>Profession</td>
-						<td>
-							<select name="profession" id="profession">
-								<option value="0">All Professions</option>
-							</select>
-						</td>
-						<td>Location</td>
-						<td>
-							<select name="location" id="locatio">
-								<option value="0">All Locations</option>
-							</select>
-						</td>
-						<td>Categories</td>
-						<td>
-							<select name="Categories" id="Categories">
-								<option value="0">All Categories</option>
-							</select>
-						</td>
-						<td>Keyword</td>
-						<td>
-							<input type="text" name="q">
-						</td>
-						<td>
-							<input type="submit">
-						</td>
-					</tr>
-				</table>
-			</form>
-		</div>
-	</div>
-</div>
 
-<div id="content">
+
+<div id="content" class="<?php if(!isset($_SESSION['usr_id'])) { echo "topfix"; } ?>">
 
 	<?php include 'quickpost.php'; ?>
-	<div id="contentContainer">
+	<div id="contentContainer"
 	<div class="heading">
 			<h1 class="heading_title">User Profile</h1>
 		</div>
