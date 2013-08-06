@@ -132,6 +132,10 @@ $totalPages_rsEmployerJobLists = ceil($totalRows_rsEmployerJobLists/$maxRows_rsE
 
 
 	<div class="center">
+<<<<<<< HEAD
+		content list
+	
+=======
 		
 
 	<div id="wrapper">
@@ -310,6 +314,7 @@ $totalPages_rsEmployerJobLists = ceil($totalRows_rsEmployerJobLists/$maxRows_rsE
 
 
 </div>
+>>>>>>> 2f8f3205824c21812a2571ff51bdfc48a5e89dfc
 	</div>
 </div>
 
